@@ -102,7 +102,6 @@ export class StreamrTransport {
 
   public async sub(onMessage, onError) {
     this.subConnection.on('open', () => {
-      console.log('Connection opened');
       this.subConnection.on('message', (data) => onMessage(JSON.parse(data.toString())));
     });
     this.subConnection.on('error', (err) => onError(err)).on('unexpected-response', (err) => onError(err));
@@ -111,7 +110,7 @@ export class StreamrTransport {
   public close() {
     switch (this.direction) {
       case 'pub':
-        this.subConnection.close();
+        this.pubConnection.close();
         break;
       case 'sub':
         this.subConnection.close();
