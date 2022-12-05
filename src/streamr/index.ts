@@ -1,1 +1,1 @@
-export { StreamrTransport } from './streamrTransport';
+export { StreamrWsClient } from './streamrWsClient';

@@ -1,4 +1,4 @@
-import WebSocket from 'ws';
+import WebSocket from 'isomorphic-ws';
 
 type Direction = 'pub' | 'sub' | 'all';
 export type StreamrConnectionOptions = {
@@ -44,7 +44,7 @@ enum Status {
   unexpected
 }
 
-export class StreamrTransport {
+export class StreamrWsClient {
   private readonly subConnection: WebSocket;
   private readonly pubConnection: WebSocket;
   private readonly subStatus: Promise<Status>;

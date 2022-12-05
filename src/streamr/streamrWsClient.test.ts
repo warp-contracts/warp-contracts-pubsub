@@ -1,10 +1,10 @@
-import { StreamrConnectionOptions, StreamrTransport } from './streamrTransport';
+import { StreamrConnectionOptions, StreamrWsClient } from './streamrWsClient';
 import { beforeEach, afterEach } from '@jest/globals';
 import * as dotenv from 'dotenv';
 
 describe('streamrTransport test', () => {
   dotenv.config();
-  let streamrTransport: StreamrTransport;
+  let streamrTransport: StreamrWsClient;
   const streamrApiKey = process.env.STREAMR_WRITE_APIKEY;
   expect(streamrApiKey).not.toBe('');
   const streamrHost = 'ws://redstone-nlb-prod-b3c531f79942790e.elb.eu-central-1.amazonaws.com';
@@ -23,7 +23,7 @@ describe('streamrTransport test', () => {
   };
   describe('happy path', () => {
     beforeEach(() => {
-      streamrTransport = new StreamrTransport(connection);
+      streamrTransport = new StreamrWsClient(connection);
     });
     afterEach(() => streamrTransport.close());
     it('should be able to publish and read message', async () => {
