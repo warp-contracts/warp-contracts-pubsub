@@ -38,6 +38,7 @@
   "dependencies": {
     "@aws-amplify/api": "^4.0.61",
     "@aws-amplify/core": "4.7.12",
+    "isomorphic-ws": "^5.0.0",
     "ws": "^8.11.0"
   },
   "devDependencies": {
