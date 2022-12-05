@@ -100,7 +100,7 @@ export class StreamrTransport {
     return this.pubConnection.send(JSON.stringify(data));
   }
 
-  public async sub(onMessage, onError) {
+  public sub(onMessage, onError) {
     this.subConnection.on('open', () => {
       this.subConnection.on('message', (data) => onMessage(JSON.parse(data.toString())));
     });

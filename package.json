@@ -5,7 +5,9 @@
   "types": "./lib/types/index.d.ts",
   "main": "./lib/cjs/index.js",
   "exports": {
-    ".": "./lib/cjs/index.js"
+    ".": "./lib/cjs/index.js",
+    "./streamr": "./lib/cjs/streamr/index.js",
+    "./appsync": "./lib/cjs/appsync/index.js"
   },
   "sideEffects": false,
   "engines": {
