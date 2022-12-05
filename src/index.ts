@@ -1,2 +1,2 @@
-export * from 'appsync';
-export * from 'streamr';
+export * from './appsync';
+export * from './streamr';
