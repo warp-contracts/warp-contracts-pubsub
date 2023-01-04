@@ -3,22 +3,33 @@ import WebSocket from 'isomorphic-ws';
 type Direction = 'pub' | 'sub' | 'all';
 export type StreamrConnectionOptions = {
   /**
+   *  Choose if you want to publish, subscribe or both
+   *  'pub' - write only
+   *  'sub' - read only
+   *  'all' - read and write
+   */
+  direction: Direction;
+  /**
    * To create a stream please visit https://streamr.network/core/streams.
    */
-  streamId: string;
+  streamId?: string;
   /**
+   Ignored if direction is sub.
    * @example: ws://my.host
    */
-  writeHost: string;
+  writeHost?: string;
   /**
+   * Ignored if direction is sub.
    * @default 7170
    */
   writePort?: number;
   /**
+   * Ignored if direction is pub.
    * @example: ws://my.host
    */
-  readHost: string;
+  readHost?: string;
   /**
+   * Ignored if direction is pub.
    * @default 7170
    */
   readPort?: number;
@@ -27,13 +38,12 @@ export type StreamrConnectionOptions = {
    * The key defined in the streamr broker configuration.
    */
   apiKey?: string;
-  direction?: Direction;
 };
 
 const CONNECTION_DEFAULTS = {
-  readHost: 'ws://redstone-nlb-prod-b3c531f79942790e.elb.eu-central-1.amazonaws.com',
+  readHost: 'ws://read.streamr.warp.cc',
   readPort: 7170,
-  writeHost: 'ws://redstone-nlb-prod-b3c531f79942790e.elb.eu-central-1.amazonaws.com',
+  writeHost: 'ws://write.streamr.warp.cc',
   writePort: 7180
 };
 
@@ -52,7 +62,18 @@ export class StreamrWsClient {
   private readonly direction: Direction;
   private error;
 
-  constructor(connection: StreamrConnectionOptions) {
+  public static async create(connection: StreamrConnectionOptions): Promise<StreamrWsClient> {
+    const client = new StreamrWsClient(connection);
+    await client.checkConnectionStatus();
+    return client;
+  }
+
+  /**
+   * Constructor can't be async. Use create method instead.
+   * @param connection
+   * @private
+   */
+  private constructor(connection: StreamrConnectionOptions) {
     const c = { ...CONNECTION_DEFAULTS, ...connection };
     if (!c.direction) {
       throw new Error('Direction is required');
@@ -95,15 +116,15 @@ export class StreamrWsClient {
     });
   }
 
-  public async pub(data) {
-    await this.checkPubConnectiontatus();
-    return this.pubConnection.send(JSON.stringify(data));
+  public async pub(data, onError?: (err?: Error) => void) {
+    return this.pubConnection.send(JSON.stringify(data), onError);
   }
 
   public sub(onMessage, onError) {
-    this.subConnection.on('open', () => {
-      this.subConnection.on('message', (data) => onMessage(JSON.parse(data.toString())));
-    });
+    if (this.subConnection.readyState !== WebSocket.OPEN) {
+      throw new Error('Sub connection is not open. Status: ' + this.subConnection.readyState);
+    }
+    this.subConnection.on('message', (data) => onMessage(JSON.parse(data.toString())));
     this.subConnection.on('error', (err) => onError(err)).on('unexpected-response', (err) => onError(err));
   }
 
@@ -122,11 +143,18 @@ export class StreamrWsClient {
     }
   }
 
-  private async checkPubConnectiontatus() {
-    const status = await this.pubStatus;
-    if (status != Status.connected) {
-      console.error(this.error);
-      throw new Error(status.toString());
+  private async checkConnectionStatus() {
+    if (this.direction == 'pub' || this.direction == 'all') {
+      const pubStatus = await this.pubStatus;
+      if (pubStatus != Status.connected) {
+        throw new Error('Pub connection error: ' + this.error);
+      }
+    }
+    if (this.direction == 'sub' || this.direction == 'all') {
+      const subStatus = await this.subStatus;
+      if (subStatus != Status.connected) {
+        throw new Error('Sub connection error: ' + this.error);
+      }
     }
   }
 }
