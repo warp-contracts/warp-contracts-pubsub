@@ -1,6 +1,6 @@
 {
   "name": "warp-contracts-pubsub",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Pub/sub library for warp contracts",
   "types": "./lib/types/index.d.ts",
   "main": "./lib/cjs/index.js",
@@ -37,8 +37,8 @@
     "README.md"
   ],
   "dependencies": {
-    "@aws-amplify/api": "^4.0.61",
-    "@aws-amplify/core": "4.7.12",
+    "@aws-amplify/api": "^5.0.19",
+    "@aws-amplify/core": "^5.1.2",
     "isomorphic-ws": "^5.0.0",
     "ws": "^8.11.0"
   },
