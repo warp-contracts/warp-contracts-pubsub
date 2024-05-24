@@ -1,1 +1,0 @@
-export { StreamrWsClient } from './streamrWsClient';
